@@ -22,7 +22,6 @@ class _MyAppState extends State<MyApp> {
   getToken() async {
     final storage = new FlutterSecureStorage();
     token = await storage.read(key: 'token');
-    print(token);
   }
 
   @override
