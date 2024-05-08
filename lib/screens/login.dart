@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:chatapp/config/token_controllers.dart';
 import 'package:chatapp/screens/home.dart';
 import 'package:chatapp/screens/signup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -20,7 +20,8 @@ String password = '';
 
 void _handleLogin(BuildContext context) async {
   isLoading = true;
-  final String url = 'http://localhost:5000/login';
+  final String url =
+      'https://chat-app-backend-production-13ff.up.railway.app/login';
   final Map<String, String> headers = {
     "Content-Type": "application/json;charset=utf-8",
   };
@@ -34,7 +35,10 @@ void _handleLogin(BuildContext context) async {
     if (response.statusCode == 200) {
       final res = await json.decode(response.body);
       print('Success');
-      await TokenControllers.saveUserData(res['token'], res['id']);
+
+      final storage = new FlutterSecureStorage();
+      await storage.write(key: "token", value: res['token']);
+      await storage.write(key: "id", value: res['id']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

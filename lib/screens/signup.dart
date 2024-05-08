@@ -18,7 +18,8 @@ String password = '';
 
 void _handleSignUp(BuildContext context) async {
   isLoading = true;
-  final String url = 'http://localhost:5000/signup';
+  final String url =
+      'https://chat-app-backend-production-13ff.up.railway.app/signup';
   final Map<String, String> headers = {
     "Content-Type": "application/json;charset=utf-8",
   };
