@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:chatapp/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -16,9 +16,9 @@ String name = '';
 String phone = '';
 String password = '';
 
-void _handleSignUp() async {
+void _handleSignUp(BuildContext context) async {
   isLoading = true;
-  final String url = 'http://172.22.176.1:5000/signup';
+  final String url = 'http://localhost:5000/signup';
   final Map<String, String> headers = {
     "Content-Type": "application/json;charset=utf-8",
   };
@@ -35,12 +35,28 @@ void _handleSignUp() async {
     final response = await http.post(uri, headers: headers, body: jsonBody);
     if (response.statusCode == 200) {
       print('Success');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+      Fluttertoast.showToast(
+        msg: "SignUp Successfully",
+      );
       isLoading = false;
     } else {
+      Fluttertoast.showToast(
+        msg: "SignUp Failed",
+      );
       print('failed');
     }
   } catch (e) {
+    Fluttertoast.showToast(
+      msg: "${e}",
+    );
     isLoading = true;
+
     print(e);
   }
 }
@@ -212,7 +228,7 @@ class _SignUpState extends State<SignUp> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _handleSignUp();
+                          _handleSignUp(context);
                         });
                       },
                       child: Text('Sign Up'),

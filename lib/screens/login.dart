@@ -1,11 +1,64 @@
+import 'dart:convert';
+
+import 'package:chatapp/config/token_controllers.dart';
+import 'package:chatapp/screens/home.dart';
 import 'package:chatapp/screens/signup.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
+}
+
+bool isLoading = false;
+String phone = '';
+String password = '';
+
+void _handleLogin(BuildContext context) async {
+  isLoading = true;
+  final String url = 'http://localhost:5000/login';
+  final Map<String, String> headers = {
+    "Content-Type": "application/json;charset=utf-8",
+  };
+
+  final Map<String, dynamic> body = {"phone": phone, "password": password};
+  final jsonBody = json.encode(body);
+  Uri uri = Uri.parse(url);
+
+  try {
+    final response = await http.post(uri, headers: headers, body: jsonBody);
+    if (response.statusCode == 200) {
+      final res = await json.decode(response.body);
+      print('Success');
+      await TokenControllers.saveUserData(res['token'], res['id']);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
+      Fluttertoast.showToast(
+        msg: "Login Successfully",
+      );
+      isLoading = false;
+    } else {
+      Fluttertoast.showToast(
+        msg: "Login Failed",
+      );
+      print('failed');
+    }
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: "errrrrr .......${e}",
+    );
+    isLoading = true;
+
+    print(e);
+  }
 }
 
 class _LoginState extends State<Login> {
@@ -74,7 +127,11 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       TextFormField(
-                        onChanged: (query) {},
+                        onChanged: (query) {
+                          setState(() {
+                            phone = query;
+                          });
+                        },
                         decoration: InputDecoration(
                             hintText: "e.g : 03xx xxxxxxxx",
                             hintStyle: TextStyle(
@@ -102,7 +159,11 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       TextFormField(
-                        onChanged: (query) {},
+                        onChanged: (query) {
+                          setState(() {
+                            password = query;
+                          });
+                        },
                         obscureText: true,
                         decoration: InputDecoration(
                             hintText: "e.g : we34wf7wfjewf4u",
@@ -132,7 +193,11 @@ class _LoginState extends State<Login> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _handleLogin(context);
+                        });
+                      },
                       child: Text('Log In'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
