@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   String? token;
   String? id;
+  IO.Socket? socket;
 
   Logout() async {
     final storage = new FlutterSecureStorage();
@@ -33,6 +34,9 @@ class _HomeState extends State<Home> {
     id = await storage.read(key: 'id');
 
     if (token == null) {
+      socket?.disconnect();
+      socket?.dispose();
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -44,18 +48,23 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
-    super.initState();
-
-    IO.Socket socket = IO.io('http://localhost:5000/', <String, dynamic>{
-      'transports': ['websocket'],
-      'autoConnect': true,
-    });
-
-    socket.on('connected', (_) {
-      print('connect to socket.io');
-    });
-    socket.emit('setup', id);
     checkToken();
+    initSocket();
+    super.initState();
+  }
+
+  initSocket() {
+    socket = IO.io("", <String, dynamic>{
+      'autoConnect': false,
+      'transports': ['websocket'],
+    });
+    socket?.connect();
+    socket?.onConnect((_) {
+      print('Connection established');
+    });
+    socket?.onDisconnect((_) => print('Connection Disconnection'));
+    socket?.onConnectError((err) => print(err));
+    socket?.onError((err) => print(err));
   }
 
   @override
