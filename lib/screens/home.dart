@@ -28,28 +28,9 @@ class _HomeState extends State<Home> {
     );
   }
 
-  checkToken() async {
-    final storage = new FlutterSecureStorage();
-    token = await storage.read(key: 'token');
-    id = await storage.read(key: 'id');
-
-    if (token == null) {
-      socket?.disconnect();
-      socket?.dispose();
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
-      );
-    }
-  }
-
   @override
   void initState() {
-    checkToken();
-    initSocket();
+    // initSocket();
     super.initState();
   }
 

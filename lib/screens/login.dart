@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:chatapp/screens/home.dart';
 import 'package:chatapp/screens/signup.dart';
+import 'package:chatapp/utils/secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +14,8 @@ class Login extends StatefulWidget {
   @override
   State<Login> createState() => _LoginState();
 }
+
+final secureStorage = SecureStorage();
 
 bool isLoading = false;
 String phone = '';
@@ -36,9 +39,7 @@ void _handleLogin(BuildContext context) async {
       final res = await json.decode(response.body);
       print('Success');
 
-      final storage = new FlutterSecureStorage();
-      await storage.write(key: "token", value: res['token']);
-      await storage.write(key: "id", value: res['id']);
+      secureStorage.write(res['token'], res['id']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

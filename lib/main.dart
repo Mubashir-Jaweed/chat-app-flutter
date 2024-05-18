@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:chatapp/screens/home.dart';
 import 'package:chatapp/screens/login.dart';
+import 'package:chatapp/utils/secure_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,16 +17,17 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String? token = '';
+  final secureStorage = SecureStorage();
 
-  getToken() async {
-    final storage = new FlutterSecureStorage();
-    token = await storage.read(key: 'token');
+  Future checkToken() async {
+    String? token = await secureStorage.read('token');
+    print(
+        '${token} main.dart ........................................................................ ');
+    return token;
   }
 
   @override
   void initState() {
-    getToken();
     super.initState();
   }
 
@@ -35,7 +36,20 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: Colors.white),
-      home: token == null ? Login() : Home(),
+      home: FutureBuilder(
+        future: checkToken(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            print(
+                '${snapshot.data}  login..........................................');
+            return const Login();
+          } else {
+            print(
+                '${snapshot.data}  home..........................................');
+            return const Home();
+          }
+        },
+      ),
     );
   }
 }
